@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
-import users from './models/users';
-
+import UserRepository from './Repositories/UserRepository';
+import User from './models/User';
 const PORT = process.env.PORT || 4000
 const HOSTNAME = process.env.HOSTNAME || 'http://localhost'
 
@@ -21,12 +21,19 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Servidor rodando com sucesso ${HOSTNAME}:${PORT}`)
-    usersModel.create({
-        nome: "Daniel",
-        descricao: "Eu"
-    }, (item) => console.log(item))
+    var teste = async () => {
+        var repo = new UserRepository(new User)
+        //var a = await repo.getAll()
+        var a = await repo.create({
+            username: "idanniellima",
+            email: "daniellima@gmail.com",
+            hash: "#$EFFFFDF"
+        })
+        
+        console.log(a)
+    }
+    
+    teste()
 })
 
-var usersModel = new users
-    //return usersModel.all(['nome'], (itens) => res.json(itens))
 
