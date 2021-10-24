@@ -1,12 +1,28 @@
 import * as express from 'express'
-import { BaseController } from '../abstract/http/BaseController';
-
+import { body, validationResult } from 'express-validator';
+import UserService from '../Services/UserService';
 export class UserController  {
+  private service: UserService
+  
+  constructor(service: UserService){
+    this.service = service
+  }
+
   get(req: express.Request, res: express.Response) {
     try {
+      console.log(req)
       return res.send("Oi")
     } catch (err) {
       console.log(err)
+    }
+  }
+
+  async post(req: express.Request, res: express.Response) {
+    try {
+      console.log(req.body)
+      return res.send("Oi")
+    } catch (error) {
+      
     }
   }
 
