@@ -5,6 +5,8 @@ import * as routes from './Routes/api'
 import "reflect-metadata";
 import {container} from "tsyringe";
 import { MethodDeclaration, MethodSignature } from 'typescript';
+import AbstractRepository from './abstract/AbstractRepository';
+import UserRepository from './Repositories/UserRepository';
 
 export default class Boostrap {
   public app: express.Application;
@@ -37,12 +39,20 @@ export default class Boostrap {
   private initializeControllers() {
     var instance = this
     routes.default.forEach(function(i) {
-      const controller = container.resolve(i.controller);
+      container.registerSingleton<AbstractRepository>("UserRepository", UserRepository)
+      var controller = container.resolve(i.controller);
 
       if(i.isResource) {
         http.METHODS.forEach(method => {
           if(typeof (controller as any)[method.toLowerCase()] == "function") {
-            (instance.router as any)[method.toLowerCase()](i.route, (controller as any)[method.toLowerCase()])
+            (instance.router as any)[method.toLowerCase()](i.route, 
+              (
+                req: express.Request, 
+                res: express.Response, 
+                next: express.NextFunction
+              ) => {
+                (controller as any)[method.toLowerCase()](req, res, next)
+            })
           }
         })
       }
