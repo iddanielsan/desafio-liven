@@ -1,11 +1,12 @@
 import * as express from 'express'
 import { body, validationResult } from 'express-validator';
 import UserService from '../Services/UserService';
+import {autoInjectable} from "tsyringe";
+
+@autoInjectable()
 export class UserController  {
-  private service: UserService
-  
+
   constructor(service: UserService){
-    this.service = service
   }
 
   get(req: express.Request, res: express.Response) {

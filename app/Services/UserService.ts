@@ -1,6 +1,8 @@
 import AbstractRepository from '../abstract/AbstractRepository';
 import bcrypt from 'bcryptjs'
+import { injectable } from 'tsyringe';
 
+@injectable()
 export default class UserService {
     private repository: AbstractRepository
 

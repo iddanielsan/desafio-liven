@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors'
 import http from 'http'
 import * as routes from './Routes/api'
+import "reflect-metadata";
+import {container} from "tsyringe";
 import { MethodDeclaration, MethodSignature } from 'typescript';
 
 export default class Boostrap {
@@ -35,7 +37,7 @@ export default class Boostrap {
   private initializeControllers() {
     var instance = this
     routes.default.forEach(function(i) {
-      var controller = new i.controller
+      const controller = container.resolve(i.controller);
 
       if(i.isResource) {
         http.METHODS.forEach(method => {

@@ -1,12 +1,11 @@
 import AbstractModel from './AbstractModel';
 import sqlite3 from 'sqlite3'
 import { open } from 'sqlite'
+import { injectable, autoInjectable } from 'tsyringe';
 
-export default abstract class AbstractRepository {
-    private model?: AbstractModel;
-
-    constructor(model: AbstractModel) {
-        this.model = model
+@injectable()
+export default class AbstractRepository {
+    constructor(private model: AbstractModel) {
     }
 
     private async db(){
