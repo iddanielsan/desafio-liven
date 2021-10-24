@@ -7,6 +7,9 @@ import {container} from "tsyringe";
 import { MethodDeclaration, MethodSignature } from 'typescript';
 import AbstractRepository from './abstract/AbstractRepository';
 import UserRepository from './Repositories/UserRepository';
+import User from './models/User';
+import AbstractModel from './abstract/AbstractModel';
+import AppProvider from './Providers/AppProvider';
 
 export default class Boostrap {
   public app: express.Application;
@@ -23,6 +26,7 @@ export default class Boostrap {
 
   public run(){
     this.app.use('/api', this.router);
+    this.loadProviders()
     this.initializeControllers()
     this.listen()
   }
@@ -35,11 +39,15 @@ export default class Boostrap {
     this.app.use(express.json())
     this.app.use(express.urlencoded({ extended: true}))
   }
+
+  private loadProviders(){
+    new AppProvider()
+  }
  
   private initializeControllers() {
     var instance = this
     routes.default.forEach(function(i) {
-      container.registerSingleton<AbstractRepository>("UserRepository", UserRepository)
+      
       var controller = container.resolve(i.controller);
 
       if(i.isResource) {

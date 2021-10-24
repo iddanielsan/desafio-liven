@@ -1,11 +1,8 @@
 import AbstractModel from './AbstractModel';
 import sqlite3 from 'sqlite3'
 import { open } from 'sqlite'
-import { injectable, autoInjectable } from 'tsyringe';
-
-@injectable()
-export default class AbstractRepository {
-    constructor(private model: AbstractModel) {
+export default abstract class AbstractRepository {
+    constructor(protected model: AbstractModel) {
     }
 
     private async db(){
@@ -36,5 +33,12 @@ export default class AbstractRepository {
         const columns = Object.keys(data)
         const values = Object.values(data)
         return await db.run(`INSERT INTO ${this.model?.getTableName()} (${columns.join(',')}) VALUES (${"?, ".repeat(columns.length).slice(0, -2)})`, values)
+    }
+
+    public async findBy(select: Array<String>, where: object){
+        var db = await this.db()
+        const whereColumn = Object.keys(where)
+        const whereValue = Object.values(where)
+        return await db.get(`SELECT ${select.join(', ')} FROM ${this.model?.getTableName()} WHERE ${whereColumn[0]} = ?`, [ whereValue[0] ])
     }
 }
