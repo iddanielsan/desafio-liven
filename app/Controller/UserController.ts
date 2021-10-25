@@ -2,13 +2,34 @@ import * as express from 'express'
 import { body, validationResult } from 'express-validator';
 import UserService from '../Services/UserService';
 import {autoInjectable} from "tsyringe";
-import IUser from '../Interfaces/IUser';
-import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
 
 @autoInjectable()
 export class UserController  {
 
   constructor(private service: UserService){
+  }
+
+  async auth(req: express.Request, res: express.Response){
+    try {
+      var token = await this.service.authUser(req.body)
+
+      if(!token) {
+        return res.status(400).json({
+          success: false,
+          error: 'login_failed_because_invalid_credentials'
+        })
+      }
+
+      return res.status(200).json({
+        success: true, 
+        token: token
+      })
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: 'internal_server_error'
+      })
+    }
   }
 
   get(req: express.Request, res: express.Response) {
@@ -33,8 +54,12 @@ export class UserController  {
 
       var user = await this.service.createNewUser(req.body)
       
-      return res.json(user)
+      return res.status(201).json(user)
     } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: 'internal_server_error'
+      })
     }
   } 
 

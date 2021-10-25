@@ -1,11 +1,31 @@
 import AbstractRepository from '../abstract/AbstractRepository';
 import bcrypt from 'bcryptjs'
 import { inject, injectable } from 'tsyringe';
-import IUser from '../Interfaces/IUser';
-
+import jwt from 'jsonwebtoken'
+import IPostUserRequest from '../Requests/IPostUserRequest';
+import IAuthUserRequest from '../Requests/IAuthUserRequest';
+import config from '../Config/Config';
 @injectable()
 export default class UserService {
     constructor(@inject('UserRepository') private repository: AbstractRepository) {
+    }
+
+    public async authUser(user: IAuthUserRequest){
+        try {
+            var find = await this.repository.findBy(['user_id', 'hash'], {
+                email: user.email
+            })
+            
+            if(!bcrypt.compareSync(user.password, find.hash)) {
+                return false
+            }
+
+            return jwt.sign({ user_id: find.user_id, username: find.username }, (config.SECRET as string), {
+                expiresIn: 3000
+            });
+        } catch (error) {
+            return false
+        }
     }
 
     private makeHash(password: string): string {
@@ -21,7 +41,7 @@ export default class UserService {
         }
     }
 
-    async createNewUser(data: IUser){
+    async createNewUser(data: IPostUserRequest){
         try {
             var find = await this.repository.findBy(['user_id'], {
                 email: data.email
