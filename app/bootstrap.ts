@@ -35,7 +35,7 @@ export default class Boostrap {
     this.app.use(cors({
         origin: ['http://localhost:3000']
     }))
-
+    
     this.app.use(express.json())
     this.app.use(express.urlencoded({ extended: true}))
   }
@@ -63,6 +63,17 @@ export default class Boostrap {
             })
           }
         })
+      } else {
+        if(typeof (controller as any)[i.method as string] == "function") {
+          (instance.router as any)[i.httpMethod?.toLowerCase() as string](i.route, 
+            (
+              req: express.Request, 
+              res: express.Response, 
+              next: express.NextFunction
+            ) => {
+              (controller as any)[i.method as string](req, res, next)
+          })
+        }
       }
     })
   }
